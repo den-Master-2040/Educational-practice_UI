@@ -14,6 +14,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    int i = 0;
+    typedef std::vector<int>  T_summands;
+    void  summands_partition(int n_start, int n_cur, const T_summands&  summands);
+    void  print_summands(int n_start, const T_summands&  summands);
+
 
 private slots:
     void on_action_triggered();
@@ -21,6 +26,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::MainWindow *ui;
