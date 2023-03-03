@@ -9,12 +9,16 @@ using namespace boost::multiprecision;
 
 /**Стандартные библиотеки**/
 #include <iostream>
-#include <thread>
+#include <QThread>
 
+/**классы*/
+#include "combination.h"
+#include "permuntation.h"
 using namespace std;
 
 /*Прототипы функций*/
-cpp_int boost_factorial(cpp_int num);
+cpp_int combination_quality(cpp_int n, cpp_int m);
+string clening_str(string str);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -28,54 +32,93 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-/**Перестановки**/
-cpp_int permutation(cpp_int n)
-{
-    /*   C = n!   */
-    return boost_factorial(n);
-}
-
-/*Сочетания*/
-cpp_int combination(cpp_int n, cpp_int m)
-{
-   /*    C = n!/m!*(n-m)!    */
-
-    return (boost_factorial(n))/
-            ((boost_factorial(m))*(boost_factorial(n-m)));
-}
-
-
-cpp_int boost_factorial(cpp_int num)
-{
-    cpp_int fact = 1;
-    for (cpp_int i = num; i > 1; --i)
-        fact *= i;
-    return fact;
-}
-
+//перестановки:
 void MainWindow::on_pushButton_clicked()
 {
-    string str =ui->lineEdit->text().toStdString();
-    cpp_int n(str);
-    n = permutation(n);
-    string result = n.str();
-    ui->textBrowser->clear();
-    ui->textBrowser->append(QString::fromStdString(result));
+    ui->textBrowser->clear();   //очищаем браузер если были прощлые рассчёты
+
+    permuntation pr;            //класс рассчёта перестановок
+
+    QThread *qth = new QThread; //создание потока для последующего выноса в него же
+
+    pr.moveToThread(qth);       //переносим в другой поток
+
+    int n = ui->lineEdit->text().toInt();   //записываем количество чисел
+
+    ui->textBrowser->append("N = " + ui->lineEdit->text());
+
+    int *a = new int[n];
+
+    string nums = ui->lineEdit_5->text().toStdString();
+
+    nums = clening_str(nums);
+
+    for (int i = 0; i < n; i++)
+        a[i] = (int)nums[i] - '0';
+
+
+    sort(a, a + n);
+
+    ui->textBrowser->append(QString::fromStdString(pr.Print(a, n)));
+
+
+    while (pr.NextSet(a, n))
+    {
+        ui->progressBar_2->setValue(pr.getProgressValue(n));
+        ui->textBrowser->append(QString::fromStdString(pr.Print(a, n)));
+    }
 }
 
 
+//сочетания
 void MainWindow::on_pushButton_2_clicked()
 {
-    string str2 =ui->lineEdit_2->text().toStdString();
-    string str3 =ui->lineEdit_3->text().toStdString();
-    cpp_int n(str2);
-    cpp_int m(str3);
-    cpp_int result = combination(n,m);
-    ui->textBrowser_2->clear();
-    ui->textBrowser_2->append(QString::fromStdString(result.str()));
+    ui->textBrowser_2->clear();   //очищаем браузер если были прощлые рассчёты
+
+    combination cb;
+
+    QThread *qth = new QThread;
+
+    cb.moveToThread(qth);
+
+    string str = ui->lineEdit_2->text().toStdString();   //записываем количество чисел
+
+    str = clening_str(str);
+    int n = str.size();
+
+    int m = ui->lineEdit_3->text().toInt();   //записываем количество чисел
+
+    int *a;
+    a = new int[n];
+
+    for (int i = 0; i < n; i++)
+      a[i] = i+1;
+
+    ui->textBrowser_2->append(QString::fromStdString(cb.Print(a, m,str)));
+    if (n >= m)
+      while (cb.NextSet(a, n, m))
+      {
+        ui->progressBar->setValue(cb.getProgressValue(n, m));
+
+        ui->textBrowser_2->append(QString::fromStdString(cb.Print(a, m,str)));
+      }
+
 }
 
+//разбиения
+void MainWindow::on_pushButton_3_clicked()
+{
+    ui->textBrowser_3->append("n=");
+        int n = 0;
+        ui->textBrowser_3->clear();
+        n = ui->lineEdit_4->text().toInt();
+        //ui->progressBar->setValue(40);
+        T_summands  summands;
+        summands_partition(n, n, summands);
+       // ui->progressBar->setValue(100);
+}
+
+//для вывода в textBorowser
 void MainWindow::print_summands(int n_start, const T_summands&  summands)
 {
     std::string str;
@@ -84,6 +127,7 @@ void MainWindow::print_summands(int n_start, const T_summands&  summands)
         str+=(std::to_string(*summands_it)) + (summands_it != summands.end() - 1 ? " + " : "\n");
     ui->textBrowser_3->append(QString::fromStdString(str));
 }
+
 void MainWindow::summands_partition(int n_start, int n_cur, const T_summands&  summands)
 {
     if(!n_cur)
@@ -97,15 +141,11 @@ void MainWindow::summands_partition(int n_start, int n_cur, const T_summands&  s
     }
 }
 
-void MainWindow::on_pushButton_3_clicked()
+//функция очищает строку от пробелов
+string clening_str(string str)
 {
-    ui->textBrowser_3->append("n=");
-        int  n = 0;
-        ui->textBrowser_3->clear();
-        n = ui->lineEdit_4->text().toInt();
-        //ui->progressBar->setValue(40);
-        T_summands  summands;
-        summands_partition(n, n, summands);
-       // ui->progressBar->setValue(100);
+    string res;
+    for(int i = 0; i < str.size();i++)
+        if(str[i] != ' ') res += str[i];
+    return res;
 }
-

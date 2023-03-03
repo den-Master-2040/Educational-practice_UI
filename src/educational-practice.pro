@@ -25,11 +25,15 @@ win32-g++:contains(ARCHITECTURE, x64): {
 }
 
 SOURCES += \
+    combination.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    permuntation.cpp
 
 HEADERS += \
-    mainwindow.h
+    combination.h \
+    mainwindow.h \
+    permuntation.h
 
 FORMS += \
     mainwindow.ui
