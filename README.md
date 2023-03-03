@@ -6,7 +6,7 @@
 
 Компилятор: MinGW
 
-![image](https://user-images.githubusercontent.com/107744290/221299002-2b2f67fd-902b-4bf2-a3b7-c03da344d247.png)
+![image](https://user-images.githubusercontent.com/107744290/222760182-4d563918-027d-4844-a307-211fb22aefa3.png)
 
 При разработке плана создания приложения было принято решение о разделении проекта на 2 части:
 1) Основное ядро программы без UI обёртки
